@@ -24,36 +24,48 @@ import java.util.*;
  */
 public class Bot extends TelegramLongPollingBot {
 
+    private final String GRN_MESSAGE = " Грн";
+    private static final String FIRST_MESSAGE = "Вітаю! Бот допоможе Вам зконвертувати обрану валюту у гривні. Оберіть потрібну валюту: ";
+    private static final String ENTER_AMOUNT_MESSAGE = "Тепер введіть потрібну суму: ";
+    private static final String AMOUNT_IN_UAH_MESSAGE = " складає приблизно: \n";
+
     private static java.net.URL URL;
-    private static HashMap<Long, String> chosenCurrencyForUser = new HashMap<>();
+    private static HashMap<Long, String> selectedCurrencyForUser = new HashMap<>();
 
     public String getBotUsername() {
         return "kolom_test_bot";
         //возвращаем юзера
     }
 
-    public void onUpdateReceived(Update e) {
-        Message msg = e.getMessage(); // Это нам понадобится
+    public void onUpdateReceived(Update update) {
+        Message msg = update.getMessage(); // Это нам понадобится
         Long userId = msg.getChatId();
         String inputMessage = msg.getText();
-        boolean isNumeric = inputMessage.chars().allMatch( Character::isDigit );
+        boolean isNumeric = inputMessage.chars().allMatch(Character::isDigit);
         if (inputMessage.equals("/start")) {
-            sendFirstMsg(msg, "Hello! Please chose your currency: ");
+            sendFirstMsg(msg, FIRST_MESSAGE);
         } else {
 
             if (!isNumeric) {
                 saveInstruments(userId, inputMessage);
-                sendAmountMessage(msg, "Please enter your amount: ");
+                sendAmountMessage(msg, ENTER_AMOUNT_MESSAGE);
             } else {
-                Double result = convert(chosenCurrencyForUser.get(userId), inputMessage);
-                sendResultMessage(msg, "Your amount in UAH: " + String.format("%.2f", result));
+                Double result = convert(selectedCurrencyForUser.get(userId), inputMessage);
+                String resultMessage =
+                        Double.valueOf(inputMessage)
+                        + " "
+                        + selectedCurrencyForUser.get(userId)
+                        + AMOUNT_IN_UAH_MESSAGE
+                        + String.format("%.2f", result)
+                        + GRN_MESSAGE;
+                sendResultMessage(msg, resultMessage);
             }
         }
     }
 
     private void saveInstruments(Long userId, String inputMessage) {
         if (InstrumentChecker.isCurrencyAvailable(inputMessage)) {
-            chosenCurrencyForUser.put(userId, inputMessage);
+            selectedCurrencyForUser.put(userId, inputMessage);
         }
     }
 
