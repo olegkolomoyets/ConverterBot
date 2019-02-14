@@ -24,10 +24,11 @@ import java.util.*;
  */
 public class Bot extends TelegramLongPollingBot {
 
-    private final String GRN_MESSAGE = " Грн";
     private static final String FIRST_MESSAGE = "Вітаю! Бот допоможе Вам зконвертувати обрану валюту у гривні. Оберіть потрібну валюту: ";
     private static final String ENTER_AMOUNT_MESSAGE = "Тепер введіть потрібну суму: ";
     private static final String AMOUNT_IN_UAH_MESSAGE = " складає приблизно: \n";
+    private static final String GRN_MESSAGE = " Грн";
+    private static final String END_MESSAGE = "Ви можете одразу ввести іншу суму. Якщо бажаєте змінити валюту, натисніть на кнопку праворуч від поля вводу тексту.";
 
     private static java.net.URL URL;
     private static HashMap<Long, String> selectedCurrencyForUser = new HashMap<>();
@@ -57,7 +58,9 @@ public class Bot extends TelegramLongPollingBot {
                         + selectedCurrencyForUser.get(userId)
                         + AMOUNT_IN_UAH_MESSAGE
                         + String.format("%.2f", result)
-                        + GRN_MESSAGE;
+                        + GRN_MESSAGE + "\n \n"
+                        + END_MESSAGE;
+
                 sendResultMessage(msg, resultMessage);
             }
         }
